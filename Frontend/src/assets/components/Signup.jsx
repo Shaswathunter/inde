@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Login from "./login.jsx";
 
-const BASE_URL = "http://localhost:5000 || https://inde-hpbc.onrender.com/"; // Update to deployed backend
+const BASE_URL = "https://inde-hpbc.onrender.com"; // Update to deployed backend
 
 export default function SignUp() {
   const [name, setName] = useState("");
