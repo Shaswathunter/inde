@@ -11,7 +11,7 @@ export default function Login() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
 
-  const BASE_URL = "http://localhost:5000"; // Update when backend is deployed
+  const BASE_URL = "http://localhost:5000 || https://inde-hpbc.onrender.com/"; // Update when backend is deployed
 
   useEffect(() => {
     const session = JSON.parse(localStorage.getItem("session"));
