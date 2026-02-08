@@ -1,42 +1,60 @@
 import User from "../models/User.js";
+import bcrypt from "bcryptjs";
 
-// ✅ Signup Controller
+// ================= SIGNUP =================
 export const signupUser = async (req, res) => {
   try {
     const { name, username, password } = req.body;
 
-    if (!name || !username || !password) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
+    // check existing user
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: "Username already exists" });
     }
 
-    const newUser = new User({ name, username, password });
-    await newUser.save();
+    // hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    res.status(201).json({ message: "Signup successful ✅" });
-  } catch (err) {
-    console.error("Signup Error:", err);
+    // 🔐 CREATE USER (ROLE AUTO-SET)
+    const user = await User.create({
+      name,
+      username,
+      password: hashedPassword,
+      role: "user", // ✅ FORCE SAVE
+    });
+
+    res.status(201).json({
+      message: "Account created successfully",
+    });
+  } catch (error) {
+    console.error("Signup error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// ✅ Login Controller
+// ================= LOGIN =================
 export const loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
 
     const user = await User.findOne({ username });
-    if (!user || user.password !== password) {
+    if (!user) {
+      return res.status(400).json({ message: "Invalid username or password ❌" });
+    }
+
+    // 🔐 COMPARE HASHED PASSWORD
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       return res.status(400).json({ message: "Invalid username or password ❌" });
     }
 
     res.status(200).json({
       message: "Login successful ✅",
-      user: { name: user.name, username: user.username },
+      user: {
+        name: user.name,
+        username: user.username,
+        role: user.role, // 🔥 VERY IMPORTANT
+      },
     });
   } catch (err) {
     console.error("Login Error:", err);
