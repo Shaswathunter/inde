@@ -20,7 +20,7 @@ const generateDeposit = () => {
   return {
     id: `${Date.now()}-${randBetween(0, 9999)}`,
     timeText: formatTime(date),
-    amount: randBetween(100, 15000),
+    amount: randBetween(2000, 15000),
     bank: randomFrom(BANKS),
     acct: maskAccount(),
     status: randomFrom(STATUSES),

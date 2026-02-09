@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Dashboard from "./Dashboard";
-import SignUp from "./Signup.jsx";
+import Dashboard from "../components/Dashboard";
+import SignUp from "../components/Signup.jsx";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -11,70 +11,86 @@ export default function Login() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
 
-  const BASE_URL = "https://inde-hpbc.onrender.com"; // Update when backend is deployed
+  const BASE_URL = "https://inde-hpbc.onrender.com";
 
+  // 🔁 AUTO LOGIN
   useEffect(() => {
-    const session = JSON.parse(localStorage.getItem("session"));
-    if (session && session.username) {
+    const session =
+      JSON.parse(localStorage.getItem("session")) ||
+      JSON.parse(sessionStorage.getItem("session"));
+
+    if (session?.username) {
       setIsLoggedIn(true);
     }
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMsg("");
-    setLoading(true);
+  e.preventDefault();
+  setMsg("");
+  setLoading(true);
 
-    try {
-      const res = await fetch(`${BASE_URL}/api/users/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+  try {
+    const res = await fetch(`${BASE_URL}/api/users/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: username.trim(), // 🔥 FIX
+        password,
+      }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (res.ok) {
-        setMsg(data.message);
-        setIsLoggedIn(true);
+    if (res.ok) {
+      const sessionData = {
+        username: data.user.username,
+        name: data.user.name,
+        role: data.user.role,
+      };
 
-        if (remember) {
-          localStorage.setItem(
-            "session",
-            JSON.stringify({ username: data.user.username, name: data.user.name })
-          );
-        }
+      if (remember) {
+        localStorage.setItem("session", JSON.stringify(sessionData));
       } else {
-        setMsg(data.message || "Invalid username or password ❌");
+        sessionStorage.setItem("session", JSON.stringify(sessionData));
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      setMsg("Server error ❌");
-    }
 
+      setIsLoggedIn(true);
+      setMsg(data.message || "Login successful ✅");
+    } else {
+      setMsg(data.message || "Invalid username or password ❌");
+    }
+  } catch (error) {
+    console.error("Login error:", error);
+    setMsg("Server error ❌");
+  } finally {
     setLoading(false);
-  };
+  }
+};
 
   const handleLogout = () => {
-    localStorage.removeItem("session");
+    localStorage.clear();
+    sessionStorage.clear();
     setIsLoggedIn(false);
   };
 
+  // 🔀 REDIRECTS
   if (isLoggedIn) return <Dashboard onLogout={handleLogout} />;
   if (showSignup) return <SignUp />;
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-[#6a11cb] to-[#2575fc]">
-      <div className="relative w-full max-w-sm rounded-2xl bg-white/90 shadow-2xl ring-1 ring-black/5 p-6 sm:p-8">
+      <div className="relative w-full max-w-sm rounded-2xl bg-white/90 shadow-2xl p-6 sm:p-8">
         <div className="absolute -top-7 left-1/2 -translate-x-1/2">
-          <div className="h-14 w-14 rounded-full bg-gradient-to-r from-[#6a11cb] to-[#2575fc] shadow-lg grid place-items-center text-white text-2xl">
+          <div className="h-14 w-14 rounded-full bg-gradient-to-r from-[#6a11cb] to-[#2575fc] text-white text-2xl grid place-items-center">
             ₹
           </div>
         </div>
 
         <div className="mt-6 text-center">
-          <h1 className="text-xl font-semibold text-slate-800">Indepay Partner</h1>
-          <p className="mt-1 text-sm text-slate-500">Sign in to manage your accounts & earnings</p>
+          <h1 className="text-xl font-semibold">Indepay Partner</h1>
+          <p className="text-sm text-slate-500">
+            Sign in to manage your accounts & earnings
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -83,47 +99,48 @@ export default function Login() {
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-800 placeholder-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+            className="h-11 w-full rounded-xl border px-4"
           />
+
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-slate-800 placeholder-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+            className="h-11 w-full rounded-xl border px-4"
           />
 
-          <div className="flex items-center justify-between">
-            <label className="inline-flex items-center gap-2 text-sm text-slate-600">
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={(e) => setRemember(e.target.checked)}
-                className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-              />
-              Remember me
-            </label>
-          </div>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+            />
+            Remember me
+          </label>
 
           <button
             type="submit"
             disabled={loading}
-            className="h-11 w-full rounded-xl bg-gradient-to-r from-[#6a11cb] to-[#2575fc] text-white font-semibold shadow-lg hover:brightness-110 active:scale-[0.99] transition disabled:opacity-60"
+            className="h-11 w-full rounded-xl bg-indigo-600 text-white font-semibold disabled:opacity-60"
           >
             {loading ? "Checking..." : "Login"}
           </button>
 
           {msg && (
-            <p className={`text-center text-sm ${msg.includes("successful") ? "text-emerald-600" : "text-rose-600"}`}>
-              {msg}
-            </p>
+            <p className="text-center text-sm text-red-600">{msg}</p>
           )}
         </form>
 
-        <p className="mt-4 text-center text-sm text-slate-500">
+        <p className="mt-4 text-center text-sm">
           New here?{" "}
-          <button onClick={() => setShowSignup(true)} className="text-indigo-600 hover:underline">
-            Sign up now
+          <button
+            onClick={() => setShowSignup(true)}
+            className="text-indigo-600 underline"
+          >
+            Sign up
           </button>
         </p>
       </div>
