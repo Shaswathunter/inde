@@ -35,11 +35,12 @@ const generateDeposit = () => {
   return {
     id: `${Date.now()}-${randBetween(0, 9999)}`,
     timeText: formatTime(date),
-    amount: randBetween(2000, 15000),
+    amount: randBetween(60, 100) * 100, // ✅ Fixed
     bank: randomFrom(BANKS),
     acct: maskAccount(),
   };
 };
+
 
 export default function DepositHistory({
   visibleCount = 6,
