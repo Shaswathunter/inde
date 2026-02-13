@@ -33,7 +33,7 @@ const AccountActivation = ({ onClose }) => {
         </h2>
 
         <p className="text-blue-500 font-semibold mb-4">
-          Activation Deposit – ₹2000
+          Activation Deposit – ₹3000
         </p>
 
         {/* QR */}
