@@ -4,23 +4,28 @@ import bcrypt from "bcryptjs";
 // ================= SIGNUP =================
 export const signupUser = async (req, res) => {
   try {
-    const { name, username, password } = req.body;
+    let { name, username, password } = req.body;
 
-    // check existing user
+    // 🔥 REQUIRED CHECK
+    if (!name || !username || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // 🔐 NORMALIZE USERNAME
+    username = username.toLowerCase().trim();
+
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(400).json({ message: "Username already exists" });
     }
 
-    // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 🔐 CREATE USER (ROLE AUTO-SET)
-    const user = await User.create({
-      name,
+    await User.create({
+      name: name.trim(),
       username,
       password: hashedPassword,
-      role: "user", // ✅ FORCE SAVE
+      role: "user",
     });
 
     res.status(201).json({
@@ -35,15 +40,23 @@ export const signupUser = async (req, res) => {
 // ================= LOGIN =================
 export const loginUser = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    let { username, password } = req.body;
 
-    const user = await User.findOne({ username });
+    // 🔥 REQUIRED CHECK
+    if (!username || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // 🔐 NORMALIZE USERNAME
+
+    const user = await User.findOne({ username }).select("+password");
+
     if (!user) {
       return res.status(400).json({ message: "Invalid username or password ❌" });
     }
 
-    // 🔐 COMPARE HASHED PASSWORD
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid username or password ❌" });
     }
@@ -53,7 +66,7 @@ export const loginUser = async (req, res) => {
       user: {
         name: user.name,
         username: user.username,
-        role: user.role, // 🔥 VERY IMPORTANT
+        role: user.role,
       },
     });
   } catch (err) {

@@ -20,18 +20,16 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      select: false, // 🔐 security best practice
+      select: false,
     },
 
     role: {
       type: String,
-      enum: ["admin", "user"],
-      default: "user", // ✅ every new signup = user
+      default: "user",
+      immutable: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 export default mongoose.model("User", userSchema);
