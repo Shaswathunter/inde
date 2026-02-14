@@ -62,7 +62,8 @@ const Dashboard = ({ onLogout }) => {
   try {
     const payload = {
       ...bankForm,
-      userId: session?._id,
+      userId: session?._id || session?.id || "demoUser",
+
       accountType: selectedCard,
     };
 
