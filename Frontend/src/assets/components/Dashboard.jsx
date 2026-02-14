@@ -12,7 +12,7 @@ import { FaBuilding, FaPowerOff, FaQrcode } from "react-icons/fa";
 import DepositHistory from "./deposit";
 import AccountActivation from "./AccountActivation";
 import Withdrawals from "./Withdrawals";
-import qr from "./qr.jpeg";
+import qrImage from "./qr.jpeg";
 
 const Dashboard = ({ onLogout }) => {
   const session =
@@ -27,10 +27,11 @@ const Dashboard = ({ onLogout }) => {
   const [showActivation, setShowActivation] = useState(false);
   const [bankForm, setBankForm] = useState({});
 
-  const commission = useMemo(
-    () => totalDeposit * 0.08,
-    [totalDeposit]
-  );
+  const commission = useMemo(() => {
+    return totalDeposit * 0.08;
+  }, [totalDeposit]);
+
+  const displayCommission = isAdmin ? commission : 0;
 
   const handleNewDeposit = (amount) => {
     setTotalDeposit((prev) => prev + Number(amount));
@@ -39,7 +40,6 @@ const Dashboard = ({ onLogout }) => {
 
   const onBankChange = (e) => {
     const { name, value, files } = e.target;
-
     setBankForm((prev) => ({
       ...prev,
       [name]: files ? files[0] : value,
@@ -48,10 +48,7 @@ const Dashboard = ({ onLogout }) => {
 
   const handleBankSubmit = (e) => {
     e.preventDefault();
-
-    console.log("Submitted Data:", bankForm);
     alert("Form Submitted Successfully");
-
     setSelectedCard(null);
     setBankForm({});
   };
@@ -59,6 +56,7 @@ const Dashboard = ({ onLogout }) => {
   const isSaving = selectedCard === "Saving Accounts";
   const isCurrent = selectedCard === "Current Accounts";
   const isCorporate = selectedCard === "Corporate Accounts";
+  const isUpi = selectedCard === "UPI IDs";
 
   const cards = useMemo(() => {
     const all = [
@@ -66,13 +64,14 @@ const Dashboard = ({ onLogout }) => {
       { icon: <MdAccountBalance />, title: "Current Accounts" },
       { icon: <FaBuilding />, title: "Corporate Accounts" },
       { icon: <FaQrcode />, title: "UPI IDs" },
-      { icon: <MdHistory />, title: "Deposit History", adminOnly: true },
+
       {
         icon: <MdAttachMoney />,
-        title: "Commission (8%)",
-        subtitle: `₹${commission.toFixed(2)}`,
-        adminOnly: true,
+        title: "8% Commission",
+        subtitle: `Earned: ₹${displayCommission.toFixed(2)}`,
       },
+
+      { icon: <MdHistory />, title: "Deposit History", adminOnly: true },
       {
         icon: <MdPayments />,
         title: "Total Deposit",
@@ -85,16 +84,17 @@ const Dashboard = ({ onLogout }) => {
         subtitle: depositCount,
         adminOnly: true,
       },
+
       { icon: <MdCardGiftcard />, title: "Rewards" },
       { icon: <MdCardGiftcard />, title: "Withdrawals" },
     ];
 
     return all.filter((c) => (c.adminOnly ? isAdmin : true));
-  }, [commission, totalDeposit, depositCount, isAdmin]);
+  }, [displayCommission, totalDeposit, depositCount, isAdmin]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#6a11cb] to-[#2575fc] pb-10">
-      
+
       {/* HEADER */}
       <div className="relative flex justify-center items-center bg-white/90 p-4 shadow-lg">
         <h1 className="text-lg sm:text-xl font-bold text-indigo-700">
@@ -127,20 +127,29 @@ const Dashboard = ({ onLogout }) => {
         ))}
       </div>
 
-      {/* ADMIN DEPOSIT HISTORY */}
-      {isAdmin && (
-        <div className="mx-6 mb-8 bg-white/90 rounded-3xl shadow-2xl p-6">
-          <h3 className="text-xl font-bold mb-4 text-indigo-700">
-            Live Deposit History
-          </h3>
-          <DepositHistory
-            visibleCount={6}
-            onNewDeposit={handleNewDeposit}
+      {/* UPI QR MODAL */}
+      {isUpi && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setSelectedCard(null)}
           />
+          <div className="relative bg-white rounded-2xl p-6 shadow-2xl w-full max-w-md text-center">
+            <h2 className="text-xl font-bold mb-4 text-indigo-700">
+              Scan UPI QR Code
+            </h2>
+            <img src={qrImage} alt="QR" className="w-60 mx-auto rounded-lg" />
+            <button
+              onClick={() => setSelectedCard(null)}
+              className="text-red-500 mt-4 w-full"
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
 
-      {/* BANK FORM MODAL */}
+      {/* BANK FORM MODAL (Original Fields Restored) */}
       {(isSaving || isCurrent || isCorporate) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div
@@ -206,24 +215,45 @@ const Dashboard = ({ onLogout }) => {
         </div>
       )}
 
-      {/* USER ACTIVATION */}
-      {!isAdmin && (
-        <div className="mx-6 mb-8 bg-white/90 rounded-2xl shadow-xl p-6 text-center">
-          <h3 className="text-xl font-bold mb-2 text-indigo-700">
-            Account Activation
+      {/* ADMIN DEPOSIT HISTORY */}
+      {isAdmin && (
+        <div className="mx-6 mb-8 bg-white/90 rounded-3xl shadow-2xl p-6">
+          <h3 className="text-xl font-bold mb-4 text-indigo-700">
+            Live Deposit History
           </h3>
-          <button
-            onClick={() => setShowActivation(true)}
-            className="px-6 py-2 rounded-lg text-white bg-gradient-to-r from-[#6a11cb] to-[#2575fc]"
-          >
-            Activate Account
-          </button>
+          <DepositHistory
+            visibleCount={6}
+            onNewDeposit={handleNewDeposit}
+          />
         </div>
       )}
+
+      {/* USER ACTIVATION */}
+      {!isAdmin && (
+  <div className="mx-6 mb-8 bg-white/90 rounded-2xl shadow-xl p-6 text-center">
+    <h3 className="text-xl font-bold mb-2 text-indigo-700">
+      Account Activation
+    </h3>
+
+    <button
+      onClick={() => setShowActivation(true)}
+      className="px-6 py-2 rounded-lg text-white bg-gradient-to-r from-[#6a11cb] to-[#2575fc]"
+    >
+      Activate Account
+    </button>
+
+    {/* ✅ New Line Added */}
+    <p className="text-sm text-gray-600 mt-2">
+      Activate for earning unlocked
+    </p>
+  </div>
+)}
+
 
       {!isAdmin && showActivation && (
         <AccountActivation onClose={() => setShowActivation(false)} />
       )}
+
     </div>
   );
 };

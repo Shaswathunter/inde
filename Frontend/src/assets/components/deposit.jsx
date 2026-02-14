@@ -21,7 +21,7 @@ const randBetween = (min, max) =>
   Math.floor(Math.random() * (max - min + 1));
 
 const maskAccount = () =>
-  `A/c ****${randBetween(1000, 9999)}`;
+  `A/c ************${randBetween(1000, 9999)}`;
 
 const formatTime = (d) =>
   d.toLocaleTimeString([], {
@@ -32,14 +32,24 @@ const formatTime = (d) =>
 
 const generateDeposit = () => {
   const date = new Date();
+
+  // ✅ Minimum 3000
+  let amount = randBetween(30, 100) * 100;
+
+  // Extra safety check (double protection)
+  if (amount < 3000) {
+    amount = 3000;
+  }
+
   return {
     id: `${Date.now()}-${randBetween(0, 9999)}`,
     timeText: formatTime(date),
-    amount: randBetween(60, 100) * 100, // ✅ Fixed
+    amount,
     bank: randomFrom(BANKS),
     acct: maskAccount(),
   };
 };
+
 
 
 export default function DepositHistory({

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { FaTelegramPlane, FaWhatsapp } from "react-icons/fa";
-import qr from "./qr.jpeg";   // 👈 SAME FOLDER IMPORT
+import qr from "./qr.jpeg";
 
 const AccountActivation = ({ onClose }) => {
   const [utr, setUtr] = useState("");
   const [screenshot, setScreenshot] = useState(null);
+  const [status, setStatus] = useState(null); // pending / success
 
   const handleSubmit = () => {
     if (!utr || !screenshot) {
@@ -13,8 +14,11 @@ const AccountActivation = ({ onClose }) => {
     }
 
     console.log({ utr, screenshot });
+
+    // After submit → show pending
+    setStatus("pending");
+
     alert("Activation request submitted successfully ✅");
-    onClose();
   };
 
   return (
@@ -27,7 +31,7 @@ const AccountActivation = ({ onClose }) => {
 
       {/* Modal */}
       <div className="relative bg-[#eef4ff] rounded-3xl p-6 w-[92%] max-w-sm shadow-2xl text-center">
-        {/* Heading */}
+        
         <h2 className="text-xl font-bold text-blue-600 mb-1">
           Account Activation
         </h2>
@@ -37,9 +41,14 @@ const AccountActivation = ({ onClose }) => {
         </p>
 
         {/* QR */}
-        <div className="w-56 h-56 mx-auto mb-4 border-2 border-blue-400 rounded-xl flex items-center justify-center bg-white">
-         <img src={qr} alt="UPI QR Code" className="w-54 h-54 object-contain" />
+        <div className="w-56 h-56 mx-auto mb-3 border-2 border-blue-400 rounded-xl flex items-center justify-center bg-white">
+          <img src={qr} alt="UPI QR Code" className="w-54 h-54 object-contain" />
         </div>
+
+        {/* ✅ NOTE ADDED */}
+        <p className="text-xs text-gray-600 mb-4">
+          ⚠️ Note: APK will be provided after deposit confirmation.
+        </p>
 
         {/* UTR */}
         <label className="block text-sm font-medium text-gray-600 mb-1 text-left">
@@ -63,7 +72,6 @@ const AccountActivation = ({ onClose }) => {
           className="w-full border border-gray-300 p-2 rounded-lg mb-4 bg-white"
         />
 
-        {/* Submit */}
         <button
           onClick={handleSubmit}
           className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-xl font-semibold transition"
@@ -71,13 +79,21 @@ const AccountActivation = ({ onClose }) => {
           Verify Deposit
         </button>
 
+        {/* ✅ STATUS BOX */}
+        {status === "pending" && (
+          <div className="mt-4 bg-yellow-100 border border-yellow-400 text-yellow-700 p-3 rounded-xl text-sm">
+            <p className="font-semibold">Deposit Request Sent ✅</p>
+            <p>Status: <span className="font-bold">Pending</span></p>
+            <p>It will be approved within 48 hours.</p>
+          </div>
+        )}
+
         {/* NEED HELP */}
         <div className="mt-5 bg-white rounded-xl p-4 shadow-inner">
           <h3 className="font-semibold text-blue-600 mb-2">
             Need Help?
           </h3>
 
-          {/* Telegram */}
           <a
             href="https://t.me/indepayofficials"
             target="_blank"
@@ -88,7 +104,6 @@ const AccountActivation = ({ onClose }) => {
             Telegram: @indepayofficials
           </a>
 
-          {/* WhatsApp */}
           <a
             href="https://wa.me/18739907389"
             target="_blank"
@@ -100,7 +115,6 @@ const AccountActivation = ({ onClose }) => {
           </a>
         </div>
 
-        {/* Close */}
         <button
           onClick={onClose}
           className="mt-4 text-sm text-gray-500 underline"
