@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   MdAccountBalance,
   MdAccountCircle,
@@ -30,16 +30,29 @@ const Dashboard = ({ onLogout }) => {
   const commission = useMemo(() => totalDeposit * 0.08, [totalDeposit]);
   const displayCommission = isAdmin ? commission : 0;
 
+  // 🔒 LOCK BACKGROUND SCROLL WHEN MODAL OPEN
+  useEffect(() => {
+    if (selectedCard || showActivation) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [selectedCard, showActivation]);
+
   const handleNewDeposit = (amount) => {
     setTotalDeposit((prev) => prev + Number(amount));
     setDepositCount((prev) => prev + 1);
   };
 
   const onBankChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
     setBankForm((prev) => ({
       ...prev,
-      [name]: files ? files[0] : value,
+      [name]: value,
     }));
   };
 
@@ -82,6 +95,7 @@ const Dashboard = ({ onLogout }) => {
       { icon: <MdCardGiftcard />, title: "Rewards" },
       { icon: <MdCardGiftcard />, title: "Withdrawals" },
     ];
+
     return all.filter((c) => (c.adminOnly ? isAdmin : true));
   }, [displayCommission, totalDeposit, depositCount, isAdmin]);
 
@@ -122,14 +136,14 @@ const Dashboard = ({ onLogout }) => {
         ))}
       </div>
 
-      {/* UPI MODAL */}
+      {/* ================= UPI MODAL ================= */}
       {isUpi && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setSelectedCard(null)}
           />
-          <div className="relative bg-white rounded-2xl p-5 w-full max-w-sm max-h-[90vh] overflow-y-auto text-center">
+          <div className="relative bg-white rounded-2xl p-5 w-full max-w-sm max-h-[90vh] overflow-y-auto text-center shadow-2xl">
             <h2 className="text-lg font-bold mb-4 text-indigo-700">
               Scan UPI QR Code
             </h2>
@@ -140,7 +154,7 @@ const Dashboard = ({ onLogout }) => {
             />
             <button
               onClick={() => setSelectedCard(null)}
-              className="text-red-500 mt-4 w-full"
+              className="w-full mt-4 bg-red-500 text-white py-2 rounded-lg"
             >
               Close
             </button>
@@ -148,7 +162,7 @@ const Dashboard = ({ onLogout }) => {
         </div>
       )}
 
-      {/* BANK FORM MODAL */}
+      {/* ================= BANK FORM ================= */}
       {(isSaving || isCurrent || isCorporate) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
@@ -157,32 +171,31 @@ const Dashboard = ({ onLogout }) => {
           />
           <form
             onSubmit={handleBankSubmit}
-            className="relative bg-white rounded-2xl p-4 sm:p-6 w-full max-w-md mx-auto max-h-[90vh] overflow-y-auto"
+            className="relative bg-white rounded-2xl p-5 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl"
           >
-            <h2 className="text-lg sm:text-xl font-bold mb-4 text-center">
+            <h2 className="text-lg font-bold mb-4 text-center">
               {selectedCard} Details
             </h2>
 
             <div className="space-y-3">
-
               <input name="bankName" placeholder="Bank Name"
                 onChange={onBankChange}
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400"
+                className="w-full border rounded-lg px-3 py-2 text-sm"
                 required />
 
               <input name="accountNumber" placeholder="Account Number"
                 onChange={onBankChange}
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400"
+                className="w-full border rounded-lg px-3 py-2 text-sm"
                 required />
 
               <input name="ifsc" placeholder="IFSC Code"
                 onChange={onBankChange}
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400"
+                className="w-full border rounded-lg px-3 py-2 text-sm"
                 required />
 
               <input name="bankPhone" placeholder="Bank Registered Phone Number"
                 onChange={onBankChange}
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400"
+                className="w-full border rounded-lg px-3 py-2 text-sm"
                 required />
 
               {isSaving && (
@@ -208,48 +221,41 @@ const Dashboard = ({ onLogout }) => {
                     onChange={onBankChange}
                     className="w-full border rounded-lg px-3 py-2 text-sm"
                     required />
-                  <input type="password" name="password" placeholder="Net Banking Password"
+                  <input type="password" name="password"
+                    placeholder="Net Banking Password"
                     onChange={onBankChange}
                     className="w-full border rounded-lg px-3 py-2 text-sm"
                     required />
                 </>
               )}
 
-              <div>
-                <label className="text-xs font-medium block mb-1">
-                  Upload QR Code
-                </label>
-                <input type="file" name="qrUpload"
-                  accept="image/*"
-                  onChange={onBankChange}
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                  required />
-              </div>
-
-              <div>
-                <label className="text-xs font-medium block mb-1">
-                  Upload Supporting File
-                </label>
-                <input type="file" name="documentUpload"
-                  onChange={onBankChange}
-                  className="w-full border rounded-lg px-3 py-2 text-sm" />
-              </div>
-
-              <button className="w-full bg-gradient-to-r from-[#6a11cb] to-[#2575fc] text-white py-2 rounded-lg text-sm">
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-[#6a11cb] to-[#2575fc] text-white py-2 rounded-lg"
+              >
                 Submit
               </button>
 
+              <button
+                type="button"
+                onClick={() => setSelectedCard(null)}
+                className="w-full bg-gray-300 text-gray-700 py-2 rounded-lg"
+              >
+                Close
+              </button>
             </div>
           </form>
         </div>
       )}
 
-      {/* WITHDRAWAL MODAL */}
+      {/* ================= WITHDRAWAL MODAL ================= */}
       {selectedCard === "Withdrawals" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40"
-            onClick={() => setSelectedCard(null)} />
-          <div className="relative w-full max-w-sm max-h-[90vh] overflow-y-auto">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setSelectedCard(null)}
+          />
+          <div className="relative w-full max-w-sm max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl">
             <Withdrawals
               role={session?.role}
               commission={commission}
@@ -259,7 +265,7 @@ const Dashboard = ({ onLogout }) => {
         </div>
       )}
 
-      {/* ADMIN DEPOSIT */}
+      {/* ADMIN SECTION */}
       {isAdmin && (
         <div className="mx-4 sm:mx-6 mb-8 bg-white/90 rounded-3xl shadow-2xl p-4 sm:p-6">
           <h3 className="text-lg font-bold mb-4 text-indigo-700">
@@ -278,14 +284,12 @@ const Dashboard = ({ onLogout }) => {
           <h3 className="text-lg font-bold mb-2 text-indigo-700">
             Account Activation
           </h3>
-
           <button
             onClick={() => setShowActivation(true)}
             className="px-6 py-2 rounded-lg text-white bg-gradient-to-r from-[#6a11cb] to-[#2575fc]"
           >
             Activate Account
           </button>
-
           <p className="text-xs text-gray-600 mt-2">
             Activate for earning unlocked
           </p>
