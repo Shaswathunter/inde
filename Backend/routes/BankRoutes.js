@@ -1,13 +1,9 @@
-import BankDetails from "../models/BankDetails.js";
+import express from "express";
+import { saveBankDetails } from "../controllers/BankControllers";
 
-export const saveBankDetails = async (req, res) => {
-  try {
-    const data = await BankDetails.create(req.body);
-    res.status(201).json({ success: true, data });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+const router = express.Router();
+
+// POST → Save bank details
+router.post("/save", saveBankDetails);
+
+export default router;

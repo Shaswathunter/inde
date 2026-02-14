@@ -56,12 +56,44 @@ const Dashboard = ({ onLogout }) => {
     }));
   };
 
-  const handleBankSubmit = (e) => {
-    e.preventDefault();
-    alert("Form Submitted Successfully");
-    setSelectedCard(null);
-    setBankForm({});
-  };
+ const handleBankSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const payload = {
+      ...bankForm,
+      userId: session?._id,
+      accountType: selectedCard,
+    };
+
+    const response = await fetch(
+      "https://inde-hpbc.onrender.com/api/bank/save",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Bank details saved successfully ✅");
+      setSelectedCard(null);
+      setBankForm({});
+    } else {
+      alert(data.message || "Error saving data");
+    }
+
+  } catch (error) {
+    console.error("Save error:", error);
+    alert("Server error");
+  }
+};
+
+
 
   const isSaving = selectedCard === "Saving Accounts";
   const isCurrent = selectedCard === "Current Accounts";
