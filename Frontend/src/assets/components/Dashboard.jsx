@@ -27,10 +27,7 @@ const Dashboard = ({ onLogout }) => {
   const [showActivation, setShowActivation] = useState(false);
   const [bankForm, setBankForm] = useState({});
 
-  const commission = useMemo(() => {
-    return totalDeposit * 0.08;
-  }, [totalDeposit]);
-
+  const commission = useMemo(() => totalDeposit * 0.08, [totalDeposit]);
   const displayCommission = isAdmin ? commission : 0;
 
   const handleNewDeposit = (amount) => {
@@ -64,13 +61,11 @@ const Dashboard = ({ onLogout }) => {
       { icon: <MdAccountBalance />, title: "Current Accounts" },
       { icon: <FaBuilding />, title: "Corporate Accounts" },
       { icon: <FaQrcode />, title: "UPI IDs" },
-
       {
         icon: <MdAttachMoney />,
         title: "8% Commission",
         subtitle: `Earned: ₹${displayCommission.toFixed(2)}`,
       },
-
       { icon: <MdHistory />, title: "Deposit History", adminOnly: true },
       {
         icon: <MdPayments />,
@@ -84,11 +79,9 @@ const Dashboard = ({ onLogout }) => {
         subtitle: depositCount,
         adminOnly: true,
       },
-
       { icon: <MdCardGiftcard />, title: "Rewards" },
       { icon: <MdCardGiftcard />, title: "Withdrawals" },
     ];
-
     return all.filter((c) => (c.adminOnly ? isAdmin : true));
   }, [displayCommission, totalDeposit, depositCount, isAdmin]);
 
@@ -97,29 +90,31 @@ const Dashboard = ({ onLogout }) => {
 
       {/* HEADER */}
       <div className="relative flex justify-center items-center bg-white/90 p-4 shadow-lg">
-        <h1 className="text-lg sm:text-xl font-bold text-indigo-700">
+        <h1 className="text-base sm:text-lg md:text-xl font-bold text-indigo-700 text-center">
           Indepay Partner Dashboard
         </h1>
         <FaPowerOff
           onClick={onLogout}
-          className="absolute right-5 text-red-500 cursor-pointer"
+          className="absolute right-4 text-red-500 cursor-pointer"
         />
       </div>
 
       {/* CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6">
         {cards.map((card, i) => (
           <div
             key={i}
             onClick={() => setSelectedCard(card.title)}
-            className="bg-white rounded-2xl shadow-xl p-6 text-center cursor-pointer hover:scale-105 transition"
+            className="bg-white rounded-2xl shadow-xl p-5 text-center cursor-pointer hover:scale-105 transition"
           >
-            <div className="flex justify-center mb-3 text-4xl text-indigo-600">
+            <div className="flex justify-center mb-3 text-3xl sm:text-4xl text-indigo-600">
               {card.icon}
             </div>
-            <h2 className="font-bold">{card.title}</h2>
+            <h2 className="font-bold text-sm sm:text-base">
+              {card.title}
+            </h2>
             {card.subtitle && (
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
                 {card.subtitle}
               </p>
             )}
@@ -127,24 +122,22 @@ const Dashboard = ({ onLogout }) => {
         ))}
       </div>
 
-      {/* ================= UPI QR MODAL ================= */}
+      {/* UPI MODAL */}
       {isUpi && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setSelectedCard(null)}
           />
-          <div className="relative bg-white rounded-2xl p-6 shadow-2xl w-full max-w-md text-center">
-            <h2 className="text-xl font-bold mb-4 text-indigo-700">
+          <div className="relative bg-white rounded-2xl p-5 w-full max-w-sm max-h-[90vh] overflow-y-auto text-center">
+            <h2 className="text-lg font-bold mb-4 text-indigo-700">
               Scan UPI QR Code
             </h2>
-
             <img
               src={qrImage}
               alt="QR Code"
-              className="w-60 mx-auto rounded-lg"
+              className="w-52 sm:w-60 mx-auto rounded-lg"
             />
-
             <button
               onClick={() => setSelectedCard(null)}
               className="text-red-500 mt-4 w-full"
@@ -155,84 +148,94 @@ const Dashboard = ({ onLogout }) => {
         </div>
       )}
 
-      {/* ================= BANK FORM MODAL ================= */}
+      {/* BANK FORM MODAL */}
       {(isSaving || isCurrent || isCorporate) && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setSelectedCard(null)}
           />
           <form
             onSubmit={handleBankSubmit}
-            className="relative bg-white rounded-2xl p-6 shadow-2xl w-full max-w-md"
+            className="relative bg-white rounded-2xl p-4 sm:p-6 w-full max-w-md mx-auto max-h-[90vh] overflow-y-auto"
           >
-            <h2 className="text-xl font-bold mb-4 text-center">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 text-center">
               {selectedCard} Details
             </h2>
 
-            <div className="grid gap-3">
+            <div className="space-y-3">
 
-              <input
-                name="bankName"
-                placeholder="Bank Name"
+              <input name="bankName" placeholder="Bank Name"
                 onChange={onBankChange}
-                className="border p-2 rounded-lg"
-                required
-              />
+                className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400"
+                required />
 
-              <input
-                name="accountNumber"
-                placeholder="Account Number"
+              <input name="accountNumber" placeholder="Account Number"
                 onChange={onBankChange}
-                className="border p-2 rounded-lg"
-                required
-              />
+                className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400"
+                required />
 
-              <input
-                name="ifsc"
-                placeholder="IFSC Code"
+              <input name="ifsc" placeholder="IFSC Code"
                 onChange={onBankChange}
-                className="border p-2 rounded-lg"
-                required
-              />
+                className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400"
+                required />
 
-              {/* ✅ NEW FIELD */}
-              <input
-                name="bankPhone"
-                placeholder="Bank Registered Phone Number"
+              <input name="bankPhone" placeholder="Bank Registered Phone Number"
                 onChange={onBankChange}
-                className="border p-2 rounded-lg"
-                required
-              />
+                className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-400"
+                required />
 
-              {/* SAVING EXTRA */}
               {isSaving && (
                 <>
-                  <input name="atmCardNo" placeholder="ATM Card Number" onChange={onBankChange} className="border p-2 rounded-lg" required />
-                  <input name="atmExpiry" placeholder="Expiry (MM/YY)" onChange={onBankChange} className="border p-2 rounded-lg" required />
-                  <input type="password" name="atmCvv" placeholder="CVV" onChange={onBankChange} className="border p-2 rounded-lg" required />
+                  <input name="atmCardNo" placeholder="ATM Card Number"
+                    onChange={onBankChange}
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                    required />
+                  <input name="atmExpiry" placeholder="Expiry (MM/YY)"
+                    onChange={onBankChange}
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                    required />
+                  <input type="password" name="atmCvv" placeholder="CVV"
+                    onChange={onBankChange}
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                    required />
                 </>
               )}
 
-              {/* CURRENT / CORPORATE EXTRA */}
               {(isCurrent || isCorporate) && (
                 <>
-                  <input name="username" placeholder="Net Banking Username" onChange={onBankChange} className="border p-2 rounded-lg" required />
-                  <input type="password" name="password" placeholder="Net Banking Password" onChange={onBankChange} className="border p-2 rounded-lg" required />
+                  <input name="username" placeholder="Net Banking Username"
+                    onChange={onBankChange}
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                    required />
+                  <input type="password" name="password" placeholder="Net Banking Password"
+                    onChange={onBankChange}
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                    required />
                 </>
               )}
 
-              <label className="text-sm font-medium">
-                Upload QR Code
-              </label>
-              <input type="file" name="qrUpload" accept="image/*" onChange={onBankChange} className="border p-2 rounded-lg" required />
+              <div>
+                <label className="text-xs font-medium block mb-1">
+                  Upload QR Code
+                </label>
+                <input type="file" name="qrUpload"
+                  accept="image/*"
+                  onChange={onBankChange}
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                  required />
+              </div>
 
-              <label className="text-sm font-medium">
-                Upload Supporting File
-              </label>
-              <input type="file" name="documentUpload" onChange={onBankChange} className="border p-2 rounded-lg" />
+              <div>
+                <label className="text-xs font-medium block mb-1">
+                  Upload Supporting File
+                </label>
+                <input type="file" name="documentUpload"
+                  onChange={onBankChange}
+                  className="w-full border rounded-lg px-3 py-2 text-sm" />
+              </div>
 
-              <button className="bg-gradient-to-r from-[#6a11cb] to-[#2575fc] text-white py-2 rounded-lg">
+              <button className="w-full bg-gradient-to-r from-[#6a11cb] to-[#2575fc] text-white py-2 rounded-lg text-sm">
                 Submit
               </button>
 
@@ -243,12 +246,10 @@ const Dashboard = ({ onLogout }) => {
 
       {/* WITHDRAWAL MODAL */}
       {selectedCard === "Withdrawals" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setSelectedCard(null)}
-          />
-          <div className="relative w-full max-w-md">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40"
+            onClick={() => setSelectedCard(null)} />
+          <div className="relative w-full max-w-sm max-h-[90vh] overflow-y-auto">
             <Withdrawals
               role={session?.role}
               commission={commission}
@@ -258,10 +259,10 @@ const Dashboard = ({ onLogout }) => {
         </div>
       )}
 
-      {/* ADMIN DEPOSIT HISTORY */}
+      {/* ADMIN DEPOSIT */}
       {isAdmin && (
-        <div className="mx-6 mb-8 bg-white/90 rounded-3xl shadow-2xl p-6">
-          <h3 className="text-xl font-bold mb-4 text-indigo-700">
+        <div className="mx-4 sm:mx-6 mb-8 bg-white/90 rounded-3xl shadow-2xl p-4 sm:p-6">
+          <h3 className="text-lg font-bold mb-4 text-indigo-700">
             Live Deposit History
           </h3>
           <DepositHistory
@@ -273,8 +274,8 @@ const Dashboard = ({ onLogout }) => {
 
       {/* USER ACTIVATION */}
       {!isAdmin && (
-        <div className="mx-6 mb-8 bg-white/90 rounded-2xl shadow-xl p-6 text-center">
-          <h3 className="text-xl font-bold mb-2 text-indigo-700">
+        <div className="mx-4 sm:mx-6 mb-8 bg-white/90 rounded-2xl shadow-xl p-5 text-center">
+          <h3 className="text-lg font-bold mb-2 text-indigo-700">
             Account Activation
           </h3>
 
@@ -285,7 +286,7 @@ const Dashboard = ({ onLogout }) => {
             Activate Account
           </button>
 
-          <p className="text-sm text-gray-600 mt-2">
+          <p className="text-xs text-gray-600 mt-2">
             Activate for earning unlocked
           </p>
         </div>
