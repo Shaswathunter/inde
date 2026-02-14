@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import userRoutes from "./routes/UserRoutes.js";
+import bankRoutes from "./routes/BankRoutes.js";
+
 dotenv.config(); // Load .env
 
 const app = express();
@@ -14,6 +16,12 @@ app.use(express.json());
 
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api/bank", bankRoutes);
+
+app.get("/test", (req, res) => {
+  res.json({ message: "API working ✅" });
+});
+
 
 // MongoDB Connection
 mongoose
