@@ -4,11 +4,11 @@ const bankDetailsSchema = new mongoose.Schema(
   {
     userId: {
       type: String,   // 🔥 changed from ObjectId
-      required: true,
+      
     },
     accountType: {
       type: String,
-      required: true,
+      
     },
     bankName: String,
     accountNumber: String,
