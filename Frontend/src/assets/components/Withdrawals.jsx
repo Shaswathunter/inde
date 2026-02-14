@@ -6,14 +6,14 @@ const Withdrawals = ({ role, commission, onClose }) => {
   const [amount, setAmount] = useState("");
 
   const [bankDetails, setBankDetails] = useState({
-    accountName: "",
+    bankName: "",
     accountNumber: "",
     ifsc: "",
   });
 
   const [usdtAddress, setUsdtAddress] = useState("");
 
-  // ✅ History with Status
+  // ================= ADMIN HISTORY =================
   const [bankHistory, setBankHistory] = useState([
     { amount: 45000, account: "******4589", status: "success" },
     { amount: 62000, account: "******7821", status: "success" },
@@ -21,27 +21,29 @@ const Withdrawals = ({ role, commission, onClose }) => {
     { amount: 120000, account: "******6654", status: "success" },
     { amount: 76000, account: "******2487", status: "success" },
     { amount: 54000, account: "******3399", status: "success" },
-    { amount: 91000, account: "******8801", status: "pending" }, // ✅ Last Pending
+    { amount: 91000, account: "******8801", status: "pending" },
   ]);
 
   const [usdtHistory, setUsdtHistory] = useState([
-    { amount: 35000, wallet: "TRX8kX...91Df", status: "success" },
-    { amount: 50000, wallet: "TRX7Lp...22Xa", status: "success" },
-    { amount: 78000, wallet: "TRX9Zp...73Fd", status: "success" },
-    { amount: 92000, wallet: "TRX5Ty...18Lp", status: "success" },
-    { amount: 61000, wallet: "TRX2Qw...44Xz", status: "success" },
-    { amount: 87000, wallet: "TRX6Re...55Pk", status: "pending" }, // ✅ Last Pending
+    { amount: 500, wallet: "TRX8kX...91Df", status: "success" },
+    { amount: 950, wallet: "TRX7Lp...22Xa", status: "success" },
+    { amount: 1500, wallet: "TRX9Zp...73Fd", status: "success" },
+    { amount: 450, wallet: "TRX5Ty...18Lp", status: "success" },
+    { amount: 2250, wallet: "TRX2Qw...44Xz", status: "success" },
+    { amount: 1000, wallet: "TRX6Re...55Pk", status: "pending" },
   ]);
 
   const handleWithdraw = () => {
-    if (!amount || Number(amount) < 30000) {
-      alert("Minimum withdrawal amount is 30,000");
-      return;
-    }
 
+    // ================= BANK VALIDATION =================
     if (withdrawType === "BANK") {
-      if (!bankDetails.accountNumber) {
-        alert("Enter account number");
+      if (!amount || Number(amount) < 30000) {
+        alert("Minimum Bank withdrawal is 30,000");
+        return;
+      }
+
+      if (!bankDetails.bankName || !bankDetails.accountNumber || !bankDetails.ifsc) {
+        alert("Please enter Bank Name, Account Number & IFSC Code");
         return;
       }
 
@@ -53,10 +55,16 @@ const Withdrawals = ({ role, commission, onClose }) => {
         ...prev,
       ]);
 
-      alert("Withdrawal Request Submitted (Pending)");
+      alert("Bank Withdrawal Request Submitted (Pending)");
     }
 
+    // ================= USDT VALIDATION =================
     if (withdrawType === "USDT") {
+      if (!amount || Number(amount) < 200 || Number(amount) > 5000) {
+        alert("USDT withdrawal must be between 200 and 5000");
+        return;
+      }
+
       if (!usdtAddress) {
         alert("Enter wallet address");
         return;
@@ -70,7 +78,7 @@ const Withdrawals = ({ role, commission, onClose }) => {
         ...prev,
       ]);
 
-      alert("Withdrawal Request Submitted (Pending)");
+      alert("USDT Withdrawal Request Submitted (Pending)");
     }
 
     setAmount("");
@@ -78,134 +86,194 @@ const Withdrawals = ({ role, commission, onClose }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-2xl p-6">
-      <h2 className="text-xl font-bold mb-2 text-center text-indigo-700">
+      <h2 className="text-xl font-bold mb-4 text-center text-indigo-700">
         Withdrawal Panel
       </h2>
 
-      {/* ✅ 24 Hour Rule Line */}
-      <p className="text-xs text-red-500 text-center mb-4">
-        Only one withdrawal allowed in 24 hours.
-      </p>
+      {/* ================= USER VIEW ================= */}
+      {role !== "admin" && (
+        <>
+          <p className="text-red-500 text-center font-semibold text-lg mt-6">
+            Please activate your account
+          </p>
 
-      <div className="grid gap-3">
+          <button
+            disabled
+            className="w-full mt-6 bg-gray-300 text-gray-500 py-2 rounded-lg cursor-not-allowed"
+          >
+            Account Activation Required
+          </button>
 
-        <select
-          value={withdrawType}
-          onChange={(e) => setWithdrawType(e.target.value)}
-          className="border p-2 rounded-lg"
-        >
-          <option value="BANK">Bank Withdrawal</option>
-          {role === "admin" && (
-            <option value="USDT">USDT Withdrawal</option>
-          )}
-        </select>
+          <button
+            onClick={onClose}
+            className="text-red-500 mt-6 w-full"
+          >
+            Close
+          </button>
+        </>
+      )}
 
-        <input
-          type="number"
-          placeholder="Enter Amount (Min 30000)"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="border p-2 rounded-lg"
-        />
+      {/* ================= ADMIN VIEW ================= */}
+      {role === "admin" && (
+        <>
+          <p className="text-xs text-red-500 text-center mb-4">
+            Only one withdrawal allowed in 24 hours.
+          </p>
 
-        {withdrawType === "BANK" && (
-          <input
-            placeholder="Account Number"
-            className="border p-2 rounded-lg"
-            value={bankDetails.accountNumber}
-            onChange={(e) =>
-              setBankDetails({ ...bankDetails, accountNumber: e.target.value })
-            }
-          />
-        )}
+          <div className="grid gap-3">
 
-        {withdrawType === "USDT" && role === "admin" && (
-          <input
-            placeholder="USDT Wallet Address"
-            className="border p-2 rounded-lg"
-            value={usdtAddress}
-            onChange={(e) => setUsdtAddress(e.target.value)}
-          />
-        )}
+            <select
+              value={withdrawType}
+              onChange={(e) => setWithdrawType(e.target.value)}
+              className="border p-2 rounded-lg"
+            >
+              <option value="BANK">Bank Withdrawal</option>
+              <option value="USDT">USDT Withdrawal</option>
+            </select>
 
-        <button
-          onClick={handleWithdraw}
-          className="bg-gradient-to-r from-[#6a11cb] to-[#2575fc] text-white py-2 rounded-lg"
-        >
-          Request Withdrawal
-        </button>
+            <input
+              type="number"
+              placeholder={
+                withdrawType === "BANK"
+                  ? "Enter Amount"
+                  : "Enter Amount (200 - 5000)"
+              }
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="border p-2 rounded-lg"
+            />
 
-        {/* BANK HISTORY */}
-        {withdrawType === "BANK" && (
-          <div className="mt-4">
-            <h3 className="font-bold text-indigo-700 mb-2">
-              Bank Withdrawal History
-            </h3>
-            <ul className="bg-gray-100 rounded-lg p-3 space-y-2">
-              {bankHistory.map((item, i) => (
-                <li
-                  key={i}
-                  className="flex justify-between items-center bg-white p-2 rounded shadow text-sm"
-                >
-                  <div>
-                    <p>₹ {item.amount.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">
-                      A/C: {item.account}
-                    </p>
-                  </div>
+            {/* ================= BANK FIELDS ================= */}
+            {withdrawType === "BANK" && (
+              <>
+                <input
+                  placeholder="Bank Name"
+                  className="border p-2 rounded-lg"
+                  value={bankDetails.bankName}
+                  onChange={(e) =>
+                    setBankDetails({
+                      ...bankDetails,
+                      bankName: e.target.value,
+                    })
+                  }
+                />
 
-                  {item.status === "success" ? (
-                    <MdCheckCircle className="text-green-500 text-lg" />
-                  ) : (
-                    <span className="text-yellow-500 text-xs font-semibold">
-                      Pending
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
+                <input
+                  placeholder="Account Number"
+                  className="border p-2 rounded-lg"
+                  value={bankDetails.accountNumber}
+                  onChange={(e) =>
+                    setBankDetails({
+                      ...bankDetails,
+                      accountNumber: e.target.value,
+                    })
+                  }
+                />
+
+                <input
+                  placeholder="IFSC Code"
+                  className="border p-2 rounded-lg"
+                  value={bankDetails.ifsc}
+                  onChange={(e) =>
+                    setBankDetails({
+                      ...bankDetails,
+                      ifsc: e.target.value,
+                    })
+                  }
+                />
+              </>
+            )}
+
+            {/* ================= USDT FIELD ================= */}
+            {withdrawType === "USDT" && (
+              <input
+                placeholder="USDT ( TRC20 ) Wallet Address"
+                className="border p-2 rounded-lg"
+                value={usdtAddress}
+                onChange={(e) => setUsdtAddress(e.target.value)}
+              />
+            )}
+
+            <button
+              onClick={handleWithdraw}
+              className="bg-gradient-to-r from-[#6a11cb] to-[#2575fc] text-white py-2 rounded-lg"
+            >
+              Request Withdrawal
+            </button>
+
+            {/* ================= BANK HISTORY ================= */}
+            {withdrawType === "BANK" && (
+              <div className="mt-4">
+                <h3 className="font-bold text-indigo-700 mb-2">
+                  Bank Withdrawal History
+                </h3>
+                <ul className="bg-gray-100 rounded-lg p-3 space-y-2">
+                  {bankHistory.map((item, i) => (
+                    <li
+                      key={i}
+                      className="flex justify-between items-center bg-white p-2 rounded shadow text-sm"
+                    >
+                      <div>
+                        <p>₹ {item.amount.toLocaleString()}</p>
+                        <p className="text-xs text-gray-500">
+                          A/C: {item.account}
+                        </p>
+                      </div>
+
+                      {item.status === "success" ? (
+                        <MdCheckCircle className="text-green-500 text-lg" />
+                      ) : (
+                        <span className="text-yellow-500 text-xs font-semibold">
+                          Pending
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* ================= USDT HISTORY ================= */}
+            {withdrawType === "USDT" && (
+              <div className="mt-4">
+                <h3 className="font-bold text-indigo-700 mb-2">
+                  USDT Withdrawal History
+                </h3>
+                <ul className="bg-gray-100 rounded-lg p-3 space-y-2">
+                  {usdtHistory.map((item, i) => (
+                    <li
+                      key={i}
+                      className="flex justify-between items-center bg-white p-2 rounded shadow text-sm"
+                    >
+                      <div>
+                        <p>{item.amount.toLocaleString()} USDT</p>
+                        <p className="text-xs text-gray-500">
+                          Wallet: {item.wallet}
+                        </p>
+                      </div>
+
+                      {item.status === "success" ? (
+                        <MdCheckCircle className="text-green-500 text-lg" />
+                      ) : (
+                        <span className="text-yellow-500 text-xs font-semibold">
+                          Pending
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <button
+              onClick={onClose}
+              className="text-red-500 mt-3"
+            >
+              Close
+            </button>
           </div>
-        )}
-
-        {/* USDT HISTORY */}
-        {withdrawType === "USDT" && role === "admin" && (
-          <div className="mt-4">
-            <h3 className="font-bold text-indigo-700 mb-2">
-              USDT Withdrawal History
-            </h3>
-            <ul className="bg-gray-100 rounded-lg p-3 space-y-2">
-              {usdtHistory.map((item, i) => (
-                <li
-                  key={i}
-                  className="flex justify-between items-center bg-white p-2 rounded shadow text-sm"
-                >
-                  <div>
-                    <p>{item.amount.toLocaleString()} USDT</p>
-                    <p className="text-xs text-gray-500">
-                      Wallet: {item.wallet}
-                    </p>
-                  </div>
-
-                  {item.status === "success" ? (
-                    <MdCheckCircle className="text-green-500 text-lg" />
-                  ) : (
-                    <span className="text-yellow-500 text-xs font-semibold">
-                      Pending
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        <button
-          onClick={onClose}
-          className="text-red-500 mt-3"
-        >
-          Close
-        </button>
-      </div>
+        </>
+      )}
     </div>
   );
 };

