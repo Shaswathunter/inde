@@ -105,13 +105,13 @@ const AccountActivation = ({ onClose }) => {
           </a>
 
           <a
-            href="https://wa.me/18739907389"
+            href="https://wa.me/+18076956565?text="
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 text-green-600 hover:underline"
           >
             <FaWhatsapp />
-            WhatsApp: +1 873 990 7389
+            WhatsApp: +18076956565
           </a>
         </div>
 
