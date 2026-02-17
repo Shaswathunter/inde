@@ -20,6 +20,7 @@ const Dashboard = ({ onLogout }) => {
     JSON.parse(sessionStorage.getItem("session"));
 
   const isAdmin = session?.role === "admin";
+const [savedAccounts, setSavedAccounts] = useState([]);
 
   const [totalDeposit, setTotalDeposit] = useState(259965);
   const [depositCount, setDepositCount] = useState(259);
