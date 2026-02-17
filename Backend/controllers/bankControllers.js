@@ -1,3 +1,6 @@
+import BankDetails from "../models/BankDetails.js";
+
+
 export const saveBankDetails = async (req, res) => {
   try {
     console.log("BODY:", req.body);
