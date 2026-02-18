@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import userRoutes from "./routes/UserRoutes.js";
 import bankRoutes from "./routes/BankRoutes.js";
+import activationRoutes from "./routes/ActivationRoute.js";
 
 dotenv.config(); // Load .env
 
@@ -17,6 +18,11 @@ app.use(express.json());
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/bank", bankRoutes);
+
+app.use("/api/activation", activationRoutes);
+
+// Static folder
+app.use("/uploads", express.static("uploads"));
 
 app.get("/test", (req, res) => {
   res.json({ message: "API working ✅" });

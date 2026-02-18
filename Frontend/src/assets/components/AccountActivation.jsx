@@ -7,19 +7,36 @@ const AccountActivation = ({ onClose }) => {
   const [screenshot, setScreenshot] = useState(null);
   const [status, setStatus] = useState(null); // pending / success
 
-  const handleSubmit = () => {
-    if (!utr || !screenshot) {
-      alert("Please enter UTR and upload screenshot");
-      return;
+ const handleSubmit = async () => {
+  if (!utr || !screenshot) {
+    alert("Please enter UTR and upload screenshot");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("utr", utr);
+  formData.append("screenshot", screenshot);
+
+  const BASE_URL = "https://inde-hpbc.onrender.com";
+try {
+  const res = await fetch(`${BASE_URL}/api/activation`, {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json();
+
+    if (res.ok) {
+      setStatus("pending");
+      alert("Activation request submitted successfully ✅");
+    } else {
+      alert(data.message || "Something went wrong");
     }
-
-    console.log({ utr, screenshot });
-
-    // After submit → show pending
-    setStatus("pending");
-
-    alert("Activation request submitted successfully ✅");
-  };
+  } catch (error) {
+    console.error(error);
+    alert("Server error");
+  }
+};
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
