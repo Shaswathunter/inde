@@ -6,9 +6,6 @@ const router = express.Router();
 
 router.post("/", upload.single("screenshot"), async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
-
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -16,12 +13,13 @@ router.post("/", upload.single("screenshot"), async (req, res) => {
       });
     }
 
-    const { utr, userId } = req.body;
+    const { utr, userId, username } = req.body;
 
     const newActivation = await Activation.create({
-      userId: userId || "demoUser",
+      userId,
+      username,
       utr,
-      screenshot: req.file.path,
+      screenshot: req.file.filename, // 🔥 only filename save
       status: "pending",
     });
 

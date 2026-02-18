@@ -43,10 +43,12 @@ export default function Login() {
 
     if (res.ok) {
       const sessionData = {
-        username: data.user.username,
-        name: data.user.name,
-        role: data.user.role,
-      };
+  _id: data.user._id,      // 🔥 ADD THIS
+  username: data.user.username,
+  name: data.user.name,
+  role: data.user.role,
+};
+
 
       if (remember) {
         localStorage.setItem("session", JSON.stringify(sessionData));
