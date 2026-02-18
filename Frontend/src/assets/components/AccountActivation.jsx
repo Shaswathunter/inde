@@ -6,25 +6,39 @@ const AccountActivation = ({ onClose }) => {
   const [utr, setUtr] = useState("");
   const [screenshot, setScreenshot] = useState(null);
   const [status, setStatus] = useState(null); // pending / success
-
- const handleSubmit = async () => {
+const handleSubmit = async () => {
   if (!utr || !screenshot) {
     alert("Please enter UTR and upload screenshot");
     return;
   }
 
+  const session =
+    JSON.parse(localStorage.getItem("session")) ||
+    JSON.parse(sessionStorage.getItem("session"));
+
   const formData = new FormData();
   formData.append("utr", utr);
   formData.append("screenshot", screenshot);
+  formData.append("userId", session?._id);
 
   const BASE_URL = "https://inde-hpbc.onrender.com";
-try {
-  const res = await fetch(`${BASE_URL}/api/activation`, {
-    method: "POST",
-    body: formData,
-  });
 
-  const data = await res.json();
+  try {
+    const res = await fetch(`${BASE_URL}/api/activation`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const text = await res.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      console.error("Non-JSON response:", text);
+      alert("Server error. Check backend logs.");
+      return;
+    }
 
     if (res.ok) {
       setStatus("pending");
@@ -32,8 +46,9 @@ try {
     } else {
       alert(data.message || "Something went wrong");
     }
+
   } catch (error) {
-    console.error(error);
+    console.error("Activation Error:", error);
     alert("Server error");
   }
 };

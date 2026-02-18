@@ -1,8 +1,5 @@
 import express from "express";
-import { saveBankDetails } from "../controllers/bankControllers.js";
-
-
-import { getUserBankDetails } from "../controllers/bankControllers.js";
+import { saveBankDetails, getUserBankDetails } from "../controllers/bankControllers.js";
 
 
 const router = express.Router();
