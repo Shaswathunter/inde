@@ -21,7 +21,6 @@ export const saveBankDetails = async (req, res) => {
   }
 };
 
-import BankDetails from "../models/BankDetails.js";
 
 export const getUserBankDetails = async (req, res) => {
   try {
@@ -32,7 +31,7 @@ export const getUserBankDetails = async (req, res) => {
     res.status(200).json({
       success: true,
       data,
-    });
+    }); 
   } catch (error) {
     res.status(500).json({
       success: false,
