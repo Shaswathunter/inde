@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const activationSchema = new mongoose.Schema(
   {
     userId: String,
+    username: String, 
     utr: String,
     screenshot: String,
     status: {
@@ -10,7 +11,7 @@ const activationSchema = new mongoose.Schema(
       default: "pending",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("Activation", activationSchema);

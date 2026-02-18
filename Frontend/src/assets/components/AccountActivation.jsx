@@ -13,13 +13,15 @@ const handleSubmit = async () => {
   }
 
   const session =
-    JSON.parse(localStorage.getItem("session")) ||
-    JSON.parse(sessionStorage.getItem("session"));
-
+  JSON.parse(localStorage.getItem("session")) ||
+  JSON.parse(sessionStorage.getItem("session"));
   const formData = new FormData();
+
+formData.append("userId", session?._id);
+formData.append("username", session?.username);
+
   formData.append("utr", utr);
   formData.append("screenshot", screenshot);
-  formData.append("userId", session?._id);
 
   const BASE_URL = "https://inde-hpbc.onrender.com";
 
