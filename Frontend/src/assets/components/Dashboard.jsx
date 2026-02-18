@@ -63,7 +63,8 @@ const [savedAccounts, setSavedAccounts] = useState([]);
   try {
     const payload = {
       ...bankForm,
-      userId: session?._id || session?.id || "demoUser",
+      username: session?.username,
+
 
       accountType: selectedCard,
     };
