@@ -28,7 +28,6 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // Serve static uploads folder
-app.use("/uploads", express.static(uploadDir));
 
 // ===========================================================
 

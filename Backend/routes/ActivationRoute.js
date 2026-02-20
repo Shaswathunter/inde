@@ -19,7 +19,7 @@ router.post("/", upload.single("screenshot"), async (req, res) => {
       userId,
       username,
       utr,
-      screenshot: req.file.filename, // 🔥 only filename save
+      screenshot: req.file.path,
       status: "pending",
     });
 
