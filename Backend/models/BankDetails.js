@@ -1,10 +1,8 @@
-import mongoose from "mongoose";
-
 const bankDetailsSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: true,   // 🔥 make required
+      required: true, // system user
     },
 
     accountType: {
@@ -16,12 +14,14 @@ const bankDetailsSchema = new mongoose.Schema(
     accountNumber: String,
     ifsc: String,
     bankPhone: String,
+
+    // 🔥 rename this
+    netBankingUsername: String,
+    password: String,
+
     atmCardNo: String,
     atmExpiry: String,
     atmCvv: String,
-    password: String,
   },
   { timestamps: true }
 );
-
-export default mongoose.model("BankDetails", bankDetailsSchema);

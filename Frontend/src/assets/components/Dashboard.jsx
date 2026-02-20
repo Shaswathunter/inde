@@ -252,7 +252,7 @@ const response = await fetch(`${BASE_URL}/api/bank/save`, {
 
               {(isCurrent || isCorporate) && (
                 <>
-                  <input name="username" placeholder="Net Banking Username"
+                  <input name="netBankingUsername" placeholder="Net Banking Username"
                     onChange={onBankChange}
                     className="w-full border rounded-lg px-3 py-2 text-sm"
                     required />
