@@ -76,8 +76,21 @@ formData.append("username", session?.username);
 
         {/* QR */}
         <div className="w-56 h-56 mx-auto mb-3 border-2 border-blue-400 rounded-xl flex items-center justify-center bg-white">
-          <img src={qr} alt="UPI QR Code" className="w-54 h-54 object-contain" />
-        </div>
+  <img src={qr} alt="UPI QR Code" className="w-54 h-54 object-contain" />
+</div>
+
+{/* 🔥 Bank Details Section */}
+<div className="bg-white rounded-xl p-4 shadow-md text-left text-sm mb-4 border border-blue-200">
+  <h3 className="text-blue-600 font-semibold mb-2 text-center">
+    Bank Account Details
+  </h3>
+
+  <p><span className="font-medium">Bank Name:</span> Indian Bank</p>
+  <p><span className="font-medium">Holder Name:</span> Himanshu Baranwal</p>
+  <p><span className="font-medium">Account No:</span> 8177852207</p>
+  <p><span className="font-medium">IFSC Code:</span> IDIB000L558</p>
+  <p><span className="font-medium">Account Type:</span> Saving</p>
+</div>
 
         {/* ✅ NOTE ADDED */}
         <p className="text-xs text-gray-600 mb-4">
