@@ -1,3 +1,6 @@
+import mongoose from "mongoose";
+
+
 const bankDetailsSchema = new mongoose.Schema(
   {
     username: {
