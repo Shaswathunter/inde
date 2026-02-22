@@ -82,17 +82,31 @@ const AccountActivation = ({ onClose }) => {
           Activation Deposit – ₹3000
         </p>
 
-        {/* QR */}
-        <div className="w-56 h-56 mx-auto mb-3 border-2 border-blue-400 rounded-xl flex items-center justify-center bg-white">
-          <img
-            src={qr}
-            alt="UPI QR Code"
-            className="w-52 h-52 object-contain"
-          />
-        </div>
+     {/* QR */}
+<div className="relative w-56 h-56 mx-auto mb-3 border-2 border-blue-400 rounded-xl flex items-center justify-center bg-white">
+
+  {/* QR Image */}
+  <img
+    src={qr}
+    alt="UPI QR Code"
+    className="w-52 h-52 object-contain opacity-60"
+  />
+
+  {/* Cross Overlay */}
+  <div className="absolute inset-0 flex items-center justify-center">
+    <div className="absolute w-full h-1 bg-red-600 rotate-45"></div>
+    <div className="absolute w-full h-1 bg-red-600 -rotate-45"></div>
+  </div>
+
+</div>
+
+{/* QR Notice Line */}
+<p className="text-xs text-red-600 font-medium mb-4">
+  Ask your agent for security deposit. Working QR code giving soon.
+</p>
 
         {/* Bank Details */}
-        <div className="bg-white rounded-xl p-4 shadow-md text-left text-sm mb-4 border border-blue-200">
+        {/* <div className="bg-white rounded-xl p-4 shadow-md text-left text-sm mb-4 border border-blue-200">
           <h3 className="text-blue-600 font-semibold mb-2 text-center">
             Bank Account Details
           </h3>
@@ -102,7 +116,7 @@ const AccountActivation = ({ onClose }) => {
           <p><span className="font-medium">Account No:</span> 8177852207</p>
           <p><span className="font-medium">IFSC Code:</span> IDIB000L558</p>
           <p><span className="font-medium">Account Type:</span> Saving</p>
-        </div>
+        </div> */}
 
         <p className="text-xs text-gray-600 mb-4">
           ⚠️ Note: APK will be provided after deposit confirmation.
