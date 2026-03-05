@@ -93,12 +93,15 @@ const AccountActivation = ({ onClose }) => {
   />
 
   {/* Cross Overlay */}
-  <div className="absolute inset-0 flex items-center justify-center">
+  {/* <div className="absolute inset-0 flex items-center justify-center">
     <div className="absolute w-full h-1 bg-red-600 rotate-45"></div>
     <div className="absolute w-full h-1 bg-red-600 -rotate-45"></div>
-  </div>
+  </div> */}
 
 </div>
+<p>
+  Abhey Rajput
+</p>
 
 {/* QR Notice Line */}
 <p className="text-xs text-red-600 font-medium mb-4">
