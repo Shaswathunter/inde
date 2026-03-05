@@ -89,7 +89,7 @@ const AccountActivation = ({ onClose }) => {
   <img
     src={qr}
     alt="UPI QR Code"
-    className="w-52 h-52 object-contain opacity-60"
+    className="w-52 h-52 object-contain opacity-100"
   />
 
   {/* Cross Overlay */}
