@@ -99,14 +99,14 @@ const AccountActivation = ({ onClose }) => {
   </div> */}
 
 </div>
-<p>
+{/* <p>
   Abhey Rajput
-</p>
+</p> */}
 
 {/* QR Notice Line */}
-<p className="text-xs text-red-600 font-medium mb-4">
+{/* <p className="text-xs text-red-600 font-medium mb-4">
   Ask your agent for security deposit. Working QR code giving soon.
-</p>
+</p> */}
 
         {/* Bank Details */}
         {/* <div className="bg-white rounded-xl p-4 shadow-md text-left text-sm mb-4 border border-blue-200">
