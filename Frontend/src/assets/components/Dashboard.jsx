@@ -12,7 +12,6 @@ import { FaBuilding, FaPowerOff, FaQrcode } from "react-icons/fa";
 import DepositHistory from "./deposit";
 import AccountActivation from "./AccountActivation";
 import Withdrawals from "./Withdrawals";
-import qrImage from "./qr.jpeg";
 
 const Dashboard = ({ onLogout }) => {
   const session =
@@ -20,7 +19,6 @@ const Dashboard = ({ onLogout }) => {
     JSON.parse(sessionStorage.getItem("session"));
 
   const isAdmin = session?.role === "admin";
-const [savedAccounts, setSavedAccounts] = useState([]);
 
   const [totalDeposit, setTotalDeposit] = useState(259965);
   const [depositCount, setDepositCount] = useState(259);
@@ -31,7 +29,6 @@ const [savedAccounts, setSavedAccounts] = useState([]);
   const commission = useMemo(() => totalDeposit * 0.08, [totalDeposit]);
   const displayCommission = isAdmin ? commission : 0;
 
-  // 🔒 LOCK BACKGROUND SCROLL WHEN MODAL OPEN
   useEffect(() => {
     if (selectedCard || showActivation) {
       document.body.style.overflow = "hidden";
@@ -49,54 +46,51 @@ const [savedAccounts, setSavedAccounts] = useState([]);
     setDepositCount((prev) => prev + 1);
   };
 
+  // ✅ handle text + file
   const onBankChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, files } = e.target;
+
     setBankForm((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: files ? files[0] : value,
     }));
   };
 
- const handleBankSubmit = async (e) => {
-  e.preventDefault();
+  // ✅ FormData submit
+  const handleBankSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    const payload = {
-      ...bankForm,
-      username: session?.username,
+    try {
+      const formData = new FormData();
 
+      Object.keys(bankForm).forEach((key) => {
+        formData.append(key, bankForm[key]);
+      });
 
-      accountType: selectedCard,
-    };
+      formData.append("username", session?.username);
+      formData.append("accountType", selectedCard);
 
-const BASE_URL = "https://inde-hpbc.onrender.com";
+      const BASE_URL = "https://inde-hpbc.onrender.com";
 
-const response = await fetch(`${BASE_URL}/api/bank/save`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify(payload),
-});
+      const response = await fetch(`${BASE_URL}/api/bank/save`, {
+        method: "POST",
+        body: formData,
+      });
 
+      const data = await response.json();
 
-    const data = await response.json();
-
-    if (response.ok) {
-      alert("Bank details saved successfully ✅");
-      setSelectedCard(null);
-      setBankForm({});
-    } else {
-      alert(data.message || "Error saving data");
+      if (response.ok) {
+        alert("Bank details saved successfully ✅");
+        setSelectedCard(null);
+        setBankForm({});
+      } else {
+        alert(data.message || "Error saving data");
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+      alert("Server error");
     }
-
-  } catch (error) {
-    console.error("Save error:", error);
-    alert("Server error");
-  }
-};
-
-
+  };
 
   const isSaving = selectedCard === "Saving Accounts";
   const isCurrent = selectedCard === "Current Accounts";
@@ -171,39 +165,14 @@ const response = await fetch(`${BASE_URL}/api/bank/save`, {
         ))}
       </div>
 
-      {/* ================= UPI MODAL ================= */}
-      {isUpi && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setSelectedCard(null)}
-          />
-          <div className="relative bg-white rounded-2xl p-5 w-full max-w-sm max-h-[90vh] overflow-y-auto text-center shadow-2xl">
-            <h2 className="text-lg font-bold mb-4 text-indigo-700">
-              Scan UPI QR Code
-            </h2>
-            <img
-              src={qrImage}
-              alt="QR Code"
-              className="w-52 sm:w-60 mx-auto rounded-lg"
-            />
-            <button
-              onClick={() => setSelectedCard(null)}
-              className="w-full mt-4 bg-red-500 text-white py-2 rounded-lg"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ================= BANK FORM ================= */}
+      {/* BANK FORM */}
       {(isSaving || isCurrent || isCorporate) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setSelectedCard(null)}
           />
+
           <form
             onSubmit={handleBankSubmit}
             className="relative bg-white rounded-2xl p-5 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl"
@@ -213,69 +182,44 @@ const response = await fetch(`${BASE_URL}/api/bank/save`, {
             </h2>
 
             <div className="space-y-3">
-              <input name="bankName" placeholder="Bank Name"
-                onChange={onBankChange}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
-                required />
-
-              <input name="accountNumber" placeholder="Account Number"
-                onChange={onBankChange}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
-                required />
-
-              <input name="ifsc" placeholder="IFSC Code"
-                onChange={onBankChange}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
-                required />
-
-              <input name="bankPhone" placeholder="Bank Registered Phone Number"
-                onChange={onBankChange}
-                className="w-full border rounded-lg px-3 py-2 text-sm"
-                required />
+              <input name="bankName" placeholder="Bank Name" onChange={onBankChange} className="w-full border rounded-lg px-3 py-2 text-sm" required />
+              <input name="accountNumber" placeholder="Account Number" onChange={onBankChange} className="w-full border rounded-lg px-3 py-2 text-sm" required />
+              <input name="ifsc" placeholder="IFSC Code" onChange={onBankChange} className="w-full border rounded-lg px-3 py-2 text-sm" required />
+              <input name="bankPhone" placeholder="Bank Phone" onChange={onBankChange} className="w-full border rounded-lg px-3 py-2 text-sm" required />
 
               {isSaving && (
                 <>
-                  <input name="atmCardNo" placeholder="ATM Card Number"
-                    onChange={onBankChange}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                    required />
-                  <input name="atmExpiry" placeholder="Expiry (MM/YY)"
-                    onChange={onBankChange}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                    required />
-                  <input type="password" name="atmCvv" placeholder="CVV"
-                    onChange={onBankChange}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                    required />
+                  <input name="atmCardNo" placeholder="ATM Card Number" onChange={onBankChange} className="w-full border rounded-lg px-3 py-2 text-sm" required />
+                  <input name="atmExpiry" placeholder="Expiry (MM/YY)" onChange={onBankChange} className="w-full border rounded-lg px-3 py-2 text-sm" required />
+                  <input type="password" name="atmCvv" placeholder="CVV" onChange={onBankChange} className="w-full border rounded-lg px-3 py-2 text-sm" required />
                 </>
               )}
 
               {(isCurrent || isCorporate) && (
                 <>
-                  <input name="netBankingUsername" placeholder="Net Banking Username"
-                    onChange={onBankChange}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                    required />
-                  <input type="password" name="password"
-                    placeholder="Net Banking Password"
-                    onChange={onBankChange}
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                    required />
+                  <input name="netBankingUsername" placeholder="Net Banking Username" onChange={onBankChange} className="w-full border rounded-lg px-3 py-2 text-sm" required />
+                  <input type="password" name="password" placeholder="Net Banking Password" onChange={onBankChange} className="w-full border rounded-lg px-3 py-2 text-sm" required />
                 </>
               )}
 
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-[#6a11cb] to-[#2575fc] text-white py-2 rounded-lg"
-              >
+              {/* ✅ QR Upload */}
+              <div>
+                <label className="text-sm font-medium">Upload QR / MQR</label>
+                <input
+                  type="file"
+                  name="qrFile"
+                  accept="image/*"
+                  onChange={onBankChange}
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                  required
+                />
+              </div>
+
+              <button type="submit" className="w-full bg-gradient-to-r from-[#6a11cb] to-[#2575fc] text-white py-2 rounded-lg">
                 Submit
               </button>
 
-              <button
-                type="button"
-                onClick={() => setSelectedCard(null)}
-                className="w-full bg-gray-300 text-gray-700 py-2 rounded-lg"
-              >
+              <button type="button" onClick={() => setSelectedCard(null)} className="w-full bg-gray-300 text-gray-700 py-2 rounded-lg">
                 Close
               </button>
             </div>
@@ -283,14 +227,11 @@ const response = await fetch(`${BASE_URL}/api/bank/save`, {
         </div>
       )}
 
-      {/* ================= WITHDRAWAL MODAL ================= */}
+      {/* WITHDRAWAL MODAL */}
       {selectedCard === "Withdrawals" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setSelectedCard(null)}
-          />
-          <div className="relative w-full max-w-sm max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setSelectedCard(null)} />
+          <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl">
             <Withdrawals
               role={session?.role}
               commission={commission}
@@ -306,10 +247,7 @@ const response = await fetch(`${BASE_URL}/api/bank/save`, {
           <h3 className="text-lg font-bold mb-4 text-indigo-700">
             Live Deposit History
           </h3>
-          <DepositHistory
-            visibleCount={6}
-            onNewDeposit={handleNewDeposit}
-          />
+          <DepositHistory visibleCount={6} onNewDeposit={handleNewDeposit} />
         </div>
       )}
 
