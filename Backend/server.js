@@ -2,7 +2,6 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import expiryMiddleware from "./middleware/expiryMiddleware.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -35,7 +34,6 @@ if (!fs.existsSync(uploadDir)) {
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(expiryMiddleware);
 
 // Routes
 app.use("/api/users", userRoutes);
