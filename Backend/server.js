@@ -34,6 +34,11 @@ if (!fs.existsSync(uploadDir)) {
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.get("/", (req, res) => {
+  res.json({
+    active: process.env.APP_ACTIVE === "true",
+  });
+});
 
 // Routes
 app.use("/api/users", userRoutes);
