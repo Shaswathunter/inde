@@ -5,7 +5,7 @@ export const saveBankDetails = async (req, res) => {
   try {
     console.log("BODY:", req.body);
 
-    const data = await BankDetails.create(req.body);
+    // const data = await BankDetails.create(req.body);
 
     res.status(201).json({
       success: true,
