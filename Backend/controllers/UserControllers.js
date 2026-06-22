@@ -21,7 +21,7 @@ export const signupUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.creat({
+    await User.create({
       name: name.trim(),
       username,
       password: hashedPassword,
@@ -33,7 +33,7 @@ export const signupUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Signup error:", error);
-    res.status(500).json({ message: "Server error frontend crash" });
+    res.status(500).json({ message: "************************** frontend crash" });
   }
 };
 
