@@ -56,6 +56,6 @@ mongoose
   .catch((err) => console.log("DB Connection Error:", err));
 
 // Start server
-app.listen(ORT, () =>
+app.listen(PORT, () =>
   console.log(`Server running on port ${PORT} 🚀`)
 );
