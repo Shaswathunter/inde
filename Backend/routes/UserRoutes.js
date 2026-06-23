@@ -1,6 +1,6 @@
 import express from "express";
 import { signupUser, loginUser } from "../controllers/UserControllers.js";
-import expiryMiddleware from "../middleware/expiryMiddleware.js";
+import expiryMiddleware from "../middlewares/expiryMiddleware.js";
 
 const router = express.Router();
 
