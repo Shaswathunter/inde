@@ -9,7 +9,9 @@ import { fileURLToPath } from "url";
 import userRoutes from "./routes/UserRoutes.js";
 import bankRoutes from "./routes/BankRoutes.js";
 import activationRoutes from "./routes/ActivationRoute.js";
-
+import cron from "node-cron";
+import Activation from "./models/Activation.js"; 
+import { cloudinary } from "./middlewares/Upload.js";
 dotenv.config();
 
 const app = express();
@@ -25,6 +27,8 @@ const uploadDir = path.join(__dirname, "uploads");
 // Create uploads folder if not exists
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
+
+  
 }
 
 // Serve static uploads folder

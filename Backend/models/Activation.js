@@ -6,6 +6,7 @@ const activationSchema = new mongoose.Schema(
     username: String, 
     utr: String,
     screenshot: String,
+    screenshotPublicId: String, // Naya field add kiya
     status: {
       type: String,
       default: "pending",
